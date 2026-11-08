@@ -135,3 +135,14 @@ Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
 ### Prisma vs Document Databases (e.g., MongoDB)
 - Prisma strictly requires bidirectional relations and predefined constraint rules (`onDelete`) at compile-time.
 - Document databases support untyped, unstructured document nesting without foreign key enforcement.
+
+## Schema Decisions
+
+### Why Book References Genre Rather than Embedding It
+- **Data Normalization & Integrity**: Normalizing `Genre` into its own table with a unique constraint prevents typos, duplicates, and inconsistent labeling across books (e.g., distinguishing "Sci-Fi" vs "Science Fiction").
+- **Cascading Updates**: Updating a genre name in a single record reflects across all linked books immediately without costly multi-row updates.
+- **Relational Consistency**: Foreign keys (`genreId` referencing `Genre(id)`) enforce database-level referential integrity, preventing orphaned book records.
+
+### Modeling in Prisma vs. a Document Database
+- In Prisma with PostgreSQL, bidirectional relation fields and foreign key constraints must be declared explicitly upfront, with schema-level cascade rules (`onDelete: Restrict` or `onDelete: Cascade`).
+- In document databases (like MongoDB), relations are typically denormalized or nested directly inside documents as subdocuments without strict relational constraints or compile-time relationship validation.
